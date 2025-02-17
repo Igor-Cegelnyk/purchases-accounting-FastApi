@@ -4,9 +4,6 @@
 ### Python ###
 __pycache__/
 
-# poetry
-poetry.lock
-
 # Environments
 .env
 .venv
