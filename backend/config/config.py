@@ -1,7 +1,10 @@
 import os
+from pathlib import Path
 
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+BASE_DIR = Path(__file__).parent.parent
 
 
 class RunConfig(BaseModel):
@@ -17,6 +20,17 @@ class DatabaseConfig(BaseModel):
     max_overflow: int = 10
 
 
+class AuthJWT(BaseModel):
+    private_key_path: Path = BASE_DIR / "authentication" / "keys" / "jwt-private.pem"
+    public_key_path: Path = BASE_DIR / "authentication" / "keys" / "jwt-public.pem"
+    algorithm: str
+    expire_minutes: int
+
+
+class ApiPrefix(BaseModel):
+    auth: str = "/auth"
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env"),
@@ -27,6 +41,8 @@ class Settings(BaseSettings):
 
     run: RunConfig
     db: DatabaseConfig
+    auth_jwt: AuthJWT
+    api_prefix: ApiPrefix = ApiPrefix()
 
 
 settings = Settings()
