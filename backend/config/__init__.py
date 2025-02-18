@@ -1,4 +1,4 @@
 __all__ = ["settings"]
 
 
-from backend.config.config import settings
+from .config import settings
