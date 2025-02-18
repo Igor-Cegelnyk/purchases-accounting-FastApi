@@ -1,10 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Header, Response
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.ext.asyncio import AsyncSession
-from starlette import status
-from starlette.status import HTTP_400_BAD_REQUEST
 
-from backend.authentication.utils import hash_password
+from starlette import status
+from starlette.status import HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
+from typing_extensions import Annotated
+
+from backend.authentication.strategies import encode_jwt
+from backend.authentication.utils import hash_password, validate_password
 from backend.config import settings
 from backend.config.exceptions.user import UsersException
 from backend.models import User
@@ -19,8 +22,10 @@ router = APIRouter(
 
 
 @router.get("/")
-async def read_root():
-    return {"message": "Hello, World!"}
+async def read_root(
+    static_token: str = Header(alias="x-auth-token"),
+):
+    return {"message": static_token}
 
 
 @router.post(
@@ -57,3 +62,33 @@ async def user_registration(
         )
 
     return UsersException.registration_successful
+
+
+@router.post(
+    "/login",
+    status_code=status.HTTP_200_OK,
+    responses={
+        200: {"description": "Повертається згенерований jwt"},
+        401: {"description": UsersException.bad_login},
+    },
+)
+async def auth_user(
+    response: Response,
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    user_repo: UserRepository = Depends(get_user_repository),
+):
+    user = await user_repo.get_user_by_username(form_data.username)
+    check_password = validate_password(
+        password=form_data.password, hashed_password=user.password
+    )
+    if not user or not check_password or not user.active:
+        raise HTTPException(
+            status_code=HTTP_401_UNAUTHORIZED,
+            detail=UsersException.bad_login,
+        )
+    access_token = encode_jwt(payload={"sub": user.id, "username": user.username})
+    response.headers["x-auth-token"] = f"Bearer {access_token}"
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+    }
