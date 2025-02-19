@@ -14,4 +14,4 @@ from .user import User
 from .product import Product
 from .receipt import Receipt
 from .payment import Payment, PaymentTypeEnum
-from .reciept_product import ReceiptProduct
+from .receipt_product import ReceiptProduct

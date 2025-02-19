@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
+from zoneinfo import ZoneInfo
 
 from sqlalchemy import DateTime, ForeignKey, Integer
 from sqlalchemy.orm import Mapped, relationship, mapped_column
@@ -12,7 +13,9 @@ if TYPE_CHECKING:
 
 
 class Receipt(Base, IdIntPkMixin):
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(ZoneInfo("Europe/Kyiv"))
+    )
     user_id: Mapped[int] = mapped_column(
         Integer,
         ForeignKey("users.id", ondelete="CASCADE"),
@@ -22,7 +25,6 @@ class Receipt(Base, IdIntPkMixin):
     user: Mapped["User"] = relationship(
         "User",
         back_populates="receipts",
-        cascade="all, delete-orphan",
         lazy="joined",
     )
 
