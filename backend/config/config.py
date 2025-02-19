@@ -29,6 +29,7 @@ class AuthJWT(BaseModel):
 
 class ApiPrefix(BaseModel):
     auth: str = "/auth"
+    receipt: str = "/receipt"
 
 
 class Settings(BaseSettings):
