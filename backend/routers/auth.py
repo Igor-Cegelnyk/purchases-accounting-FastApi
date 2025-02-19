@@ -86,7 +86,7 @@ async def auth_user(
             status_code=HTTP_401_UNAUTHORIZED,
             detail=UsersException.bad_login,
         )
-    access_token = encode_jwt(payload={"sub": user.id, "username": user.username})
+    access_token = encode_jwt(payload={"sub": str(user.id), "username": user.username})
     response.headers["x-auth-token"] = f"Bearer {access_token}"
     return {
         "access_token": access_token,
