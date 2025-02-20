@@ -1,6 +1,6 @@
-from typing import Sequence, Any, List
+from typing import List
 
-from sqlalchemy import select, Row, RowMapping
+from sqlalchemy import select
 
 from backend.models import Product
 from backend.repositories import SqlAlchemyRepository
