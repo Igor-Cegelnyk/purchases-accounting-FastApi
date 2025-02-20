@@ -1,7 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from backend.schemas.payment import PaymentCreate
 from backend.schemas.receipt_product import ProductInput
