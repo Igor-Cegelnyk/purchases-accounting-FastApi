@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Квитанція</title>
+    <style>
+        body {
+            font-family: monospace;
+            max-width: {{line_length}}px;
+            margin: auto;
+            padding: 10px;
+            border: 1px solid #000;
+        }
+        .header, .footer {
+            text-align: center;
+            font-weight: bold;
+        }
+        .separator {
+            text-align: center;
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+        .separator::before {
+            content: attr(data-separator);
+        }
+        .line {
+            border-top: 2px solid #000;
+            margin: 10px 0;
+        }
+        .item {
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 5px;
+        }
+        .quantity-price {
+            text-align: left;
+            font-weight: bold;
+            display: block;
+            width: 100%;
+        }
+        .product-info {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .product-name {
+            text-align: left;
+            flex-grow: 1;
+        }
+        .product-total {
+            text-align: right;
+            white-space: nowrap;
+        }
+        .receipt-total {
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+    <script>
+        function adjustSeparators() {
+            document.querySelectorAll('.separator').forEach(el => {
+                const width = el.parentElement.clientWidth;
+                const count = Math.floor(width / 7);
+                const separatorChar = el.getAttribute('data-separator') || '=';
+                el.setAttribute('data-separator', separatorChar.repeat(count));
+            });
+        }
+        window.onload = adjustSeparators;
+        window.onresize = adjustSeparators;
+    </script>
+</head>
+<body>
+    <div class="header">{{ receipt.user.username }}</div>
+    <div class="separator" data-separator="="></div>
+
+    {% for product in receipt.products %}
+    <div class="item">
+        <span class="quantity-price">{{ product.quantity }} x {{ "%.2f"|format(product.price) }}</span>
+        <div class="product-info">
+            <span class="product-name">{{ product.product.name }}</span>
+            <span class="product-total">{{ "%.2f"|format(product.total) }}</span>
+        </div>
+    </div>
+    <div class="separator" data-separator="-"></div>
+    {% endfor %}
+
+    <div class="separator" data-separator="="></div>
+    <div class="receipt-total"><strong>СУМА</strong> <span>{{ "%.2f"|format(receipt.total) }}</span></div>
+    <div class="receipt-total"><strong>{{ "Готівка" if receipt.payment.type == "cash" else "Картка" }}</strong> <span>{{ "%.2f"|format(receipt.payment.amount) }}</span></div>
+    <div class="receipt-total"><strong>Решта</strong> <span>{{ "%.2f"|format(receipt.payment.amount - receipt.total) }}</span></div>
+    <div class="separator" data-separator="="></div>
+
+    <div class="footer">{{ create_at_formatted }}</div>
+    <div class="footer">Дякуємо за покупку!</div>
+</body>
+</html>
