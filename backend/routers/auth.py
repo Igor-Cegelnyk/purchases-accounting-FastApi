@@ -9,7 +9,7 @@ from typing_extensions import Annotated
 from backend.authentication.strategies import encode_jwt
 from backend.authentication.utils import hash_password, validate_password
 from backend.config import settings
-from backend.config.exceptions.user import UsersException
+from backend.config.exceptions import UsersException
 from backend.models import User
 from backend.repositories import UserRepository
 from backend.routers.dependencies import get_user_repository
