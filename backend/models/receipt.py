@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 from zoneinfo import ZoneInfo
 
-from sqlalchemy import DateTime, ForeignKey, Integer
+from sqlalchemy import DateTime, ForeignKey, Integer, DECIMAL
 from sqlalchemy.orm import Mapped, relationship, mapped_column
 
 from backend.models import Base
@@ -21,6 +21,7 @@ class Receipt(Base, IdIntPkMixin):
         ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
     )
+    total: Mapped[float] = mapped_column(DECIMAL, nullable=False)
 
     user: Mapped["User"] = relationship(
         "User",
