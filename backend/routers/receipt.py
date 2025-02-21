@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from typing import TYPE_CHECKING
 
@@ -21,7 +22,8 @@ from backend.schemas.user import UserRead
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
 
-templates = Jinja2Templates(directory="templates")
+
+templates = Jinja2Templates(directory=os.getenv("TEMPLATE_DIR", "templates"))
 
 router = APIRouter(
     prefix=settings.api_prefix.receipt,
@@ -29,7 +31,10 @@ router = APIRouter(
 )
 
 
-@router.post("/create_receipt")
+@router.post(
+    "/create_receipt",
+    summary="Створення нового чека",
+)
 async def create_receipt(
     receipt_in: ReceiptCreate,
     user: UserRead = Depends(validate_auth_user),
@@ -54,7 +59,10 @@ async def create_receipt(
     return ReceiptRead(**result[0])
 
 
-@router.get("/get_receipts")
+@router.get(
+    "/get_receipts",
+    summary="Перегляд власних чеків",
+)
 async def get_receipts(
     receipt_id: int | None = None,
     receipt_cost: float | None = None,
@@ -80,7 +88,11 @@ async def get_receipts(
     return [ReceiptRead(**receipt) for receipt in receipts]
 
 
-@router.get("/check_receipt", response_class=HTMLResponse)
+@router.get(
+    "/check_receipt",
+    summary="Перегляд чеку за унікальним номером",
+    response_class=HTMLResponse,
+)
 async def check_receipt(
     request: Request,
     receipt_id: int,
