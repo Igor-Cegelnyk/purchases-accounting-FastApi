@@ -21,15 +21,9 @@ router = APIRouter(
 )
 
 
-@router.get("/")
-async def read_root(
-    static_token: str = Header(alias="x-auth-token"),
-):
-    return {"message": static_token}
-
-
 @router.post(
     "/registration",
+    summary="Реєстрація користувача",
     status_code=status.HTTP_201_CREATED,
     responses={
         201: {"description": UsersException.registration_successful},
@@ -66,6 +60,7 @@ async def user_registration(
 
 @router.post(
     "/login",
+    summary="Автентифікація зареєстрованого користувача",
     status_code=status.HTTP_200_OK,
     responses={
         200: {"description": "Повертається згенерований jwt"},
